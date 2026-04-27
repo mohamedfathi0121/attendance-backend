@@ -1,8 +1,6 @@
 const express = require("express");
 const router = express.Router();
 const QRCode = require("qrcode");
-
-const { readExcel, writeExcel, getTodayColumn } = require("../utils/excel");
 const { sendEmail } = require("../utils/mailer");
 const multer = require("multer");
 const XLSX = require("xlsx");
@@ -20,9 +18,6 @@ const storage = multer.diskStorage({
 
 const upload = multer({ storage });
 /* ✅ GET STUDENTS */
-router.get("/students", (req, res) => {
-  res.json(readExcel());
-});
 
 /* ✅ GENERATE QR */
 router.post("/generate-qr", async (req, res) => {
