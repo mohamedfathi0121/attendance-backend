@@ -92,13 +92,13 @@ router.post("/verify", async (req, res) => {
   if (!record) {
     record = {
       date: today,
-      checkIn: new Date().toLocaleString(), // 🔥 IMPORTANT
+      checkIn: new Date(), // 🔥 IMPORTANT
     };
 
     student.attendance.push(record);
   } else {
     // ✅ If exists but no checkIn → update it
-    record.checkIn = new Date().toLocaleString();
+    record.checkIn = new Date();
   }
 
   // ✅ ONLY ONE SAVE
@@ -173,7 +173,7 @@ router.post("/leave", async (req, res) => {
   }
 
   // ✅ ONLY check-out
-  record.checkOut = new Date().toLocaleString();
+  record.checkOut = new Date();
 
   await student.save();
 
@@ -330,9 +330,49 @@ router.post("/send-emails", async (req, res) => {
       const qrImage = await QRCode.toBuffer(qrData);
 
       const html = `
-        <h2>Hello ${s.name}</h2>
-        <p>Your QR is attached</p>
-      `;
+  <div style="font-family: Arial, sans-serif; background:#f4f6f8; padding:20px;">
+    
+    <table width="100%" cellpadding="0" cellspacing="0" style="max-width:600px; margin:auto; background:white; border-radius:10px; padding:20px;">
+      
+      <!-- HEADER -->
+      <tr>
+        <!-- LOGO LEFT -->
+        <td style="width:80px; vertical-align:top;">
+          <img 
+            src="http://www.hnu.edu.eg/images/logo.png"
+            alt="Logo"
+            style="width:70px;"
+          />
+        </td>
+
+        <!-- TEXT RIGHT -->
+        <td style="vertical-align:top; padding-left:10px;">
+          <h2 style="margin:0; color:#2c3e50;">Attendance System</h2>
+          <p style="margin:5px 0; color:#555;">
+            Hello <strong>${s["Student Name"]}</strong>
+          </p>
+        </td>
+      </tr>
+
+      <!-- BODY -->
+      <tr>
+        <td colspan="2" style="padding-top:20px; text-align:center;">
+          <p style="color:#555;">
+            Please find your QR code attached below. Don't Share it with anyone, as it's unique to you and will be used for attendance verification.
+          </p>
+        </td>
+      </tr>
+
+      <!-- FOOTER -->
+      <tr>
+        <td colspan="2" style="padding-top:20px; text-align:center; font-size:12px; color:#999;">
+          © 2026 HNU. All rights reserved.
+        </td>
+      </tr>
+
+    </table>
+  </div>
+`;
 
       await sendEmail(s.email, "Your QR Code", html, {
         filename: "qr.png",
